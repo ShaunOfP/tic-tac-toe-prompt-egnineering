@@ -55,6 +55,23 @@ function render() {
 }
 
 
+function restart(){
+    fields = [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    ];
+
+    render();
+}
+
+
 function handleClick(row, col) {
     const index = row * 3 + col;
 
@@ -115,7 +132,7 @@ function generateAnimatedCrossSVG() {
 function checkGameStatus() {
     for (const combination of winningCombinations) {
         const [a, b, c] = combination;
-        if (fields[a] && fields[a] === fields[b] && fields[a] === fields[c]) {
+        if (fields[a] && fields[a] === fields[b] && fields[a] === fields[c]) { // hier wird geprüft, ob feld 1 den gleichen wert hat wie feld 2 und ob feld 2 den gleichen wert hat wie feld 3 und fields[a] bedeutet, dass das erste feld nicht null ist (null = 0; true = 1)
             // Das Spiel ist vorbei, jemand hat gewonnen
             drawWinningLine(combination);
             return fields[a]; // Gibt den Gewinner zurück (circle oder cross)

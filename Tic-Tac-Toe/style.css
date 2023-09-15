@@ -3,17 +3,22 @@ body {
     font-family: 'OpenSans', sans-serif;
     margin: 0;
     color: white;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
 }
 
-h1{
+h1 {
     text-align: center;
 }
 
-#content{
+#content {
     display: flex;
     justify-content: center;
     align-items: center;
     margin-top: 300px;
+    position: relative;
+    width: 300px;
 }
 
 table {
@@ -28,6 +33,12 @@ td {
     text-align: center;
     font-size: 36px;
     font-weight: bold;
+    cursor: pointer;
+
+}
+
+td:hover {
+    background-color: rgba(255, 255, 255, 0.3);
 }
 
 table td {

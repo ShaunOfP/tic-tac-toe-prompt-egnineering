@@ -1,14 +1,24 @@
 let fields = [
     null,
-    "circle",
     null,
     null,
-    "cross",
+    null,
+    null,
     null,
     null,
     null,
     null
 ];
+
+
+const winningCombinations = [
+    [0, 1, 2], [3, 4, 5], [6, 7, 8], // Horizontale Reihen
+    [0, 3, 6], [1, 4, 7], [2, 5, 8], // Vertikale Reihen
+    [0, 4, 8], [2, 4, 6] // Diagonale Reihen
+];
+
+
+let currentPlayer = "circle";
 
 
 function init() {
@@ -26,6 +36,9 @@ function render() {
             const cell = document.createElement('td');
             const fieldValue = fields[i * 3 + j];
 
+            // Füge das onclick-Attribut hinzu und weise die handleClick-Funktion zu
+            cell.setAttribute('onclick', `handleClick(${i}, ${j})`);
+
             if (fieldValue === 'circle') {
                 cell.innerHTML = generateAnimatedCircleSVG();
             } else if (fieldValue === 'cross') {
@@ -39,6 +52,33 @@ function render() {
 
     content.innerHTML = '';
     content.appendChild(table);
+}
+
+
+function handleClick(row, col) {
+    const index = row * 3 + col;
+
+    // Überprüfe, ob das Spiel bereits vorbei ist
+    if (checkGameStatus()) {
+        return;
+    }
+
+    // Überprüfe, ob das Feld bereits belegt ist
+    if (fields[index] === null) {
+        fields[index] = currentPlayer;
+        render(); // Aktualisiere das Spielfeld
+        currentPlayer = currentPlayer === "circle" ? "cross" : "circle"; // Wechsle den Spieler
+
+        // Entferne das onclick-Attribut, um erneutes Klicken zu verhindern
+        document.querySelector(`[onclick="handleClick(${row}, ${col})"]`).removeAttribute('onclick');
+
+        // Überprüfe erneut, ob das Spiel nach dem aktuellen Zug vorbei ist
+        const gameStatus = checkGameStatus();
+        if (gameStatus) {
+            // Hier kannst du entsprechende Aktionen ausführen, z.B. den Gewinner anzeigen oder das Spiel neu starten
+            console.log("Spiel vorbei! Gewinner: " + gameStatus);
+        }
+    }
 }
 
 
@@ -69,4 +109,51 @@ function generateAnimatedCrossSVG() {
         </svg>
     `;
     return crossSVG;
+}
+
+
+function checkGameStatus() {
+    for (const combination of winningCombinations) {
+        const [a, b, c] = combination;
+        if (fields[a] && fields[a] === fields[b] && fields[a] === fields[c]) {
+            // Das Spiel ist vorbei, jemand hat gewonnen
+            drawWinningLine(combination);
+            return fields[a]; // Gibt den Gewinner zurück (circle oder cross)
+        }
+    }
+
+    // Überprüfe, ob das Spiel unentschieden ist
+    if (!fields.includes(null)) {
+        return 'draw'; // Unentschieden
+    }
+
+    return null; // Das Spiel ist noch nicht vorbei
+}
+
+
+// Funktion, um eine weiße Linie zu zeichnen, die die gewinnenden Elemente verbindet
+function drawWinningLine(combination) {
+    const content = document.getElementById('content');
+    const [a, b, c] = combination;
+
+    // Erstelle ein SVG-Element für die Linie
+    const lineSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    lineSVG.setAttribute("width", "100%");
+    lineSVG.setAttribute("height", "100%");
+    lineSVG.style.position = "absolute";
+    lineSVG.style.zIndex = "1";
+    
+    // Zeichne die Linie
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    const cells = document.querySelectorAll('td');
+    line.setAttribute("x1", cells[a].offsetLeft + cells[a].offsetWidth / 2);
+    line.setAttribute("y1", cells[a].offsetTop + cells[a].offsetHeight / 2);
+    line.setAttribute("x2", cells[c].offsetLeft + cells[c].offsetWidth / 2);
+    line.setAttribute("y2", cells[c].offsetTop + cells[c].offsetHeight / 2);
+    line.setAttribute("stroke", "white");
+    line.setAttribute("stroke-width", "5");
+    lineSVG.appendChild(line);
+
+    // Füge das SVG-Element zum Content-Container hinzu
+    content.appendChild(lineSVG);
 }
